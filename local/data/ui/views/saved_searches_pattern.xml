@@ -1,0 +1,117 @@
+<dashboard>
+  <label>Saved Searches Pattern</label>
+  <row>
+    <panel>
+      <title>Top 10 commands used</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| table search 
+|eval commands=commands(search)|mvexpand commands| stats count as TotalTimesUsed by commands| sort - TotalTimesUsed limit=10</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="TotalTimesUsed">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="UniqueSearches">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Top 10 Commands Used in Most Searches</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| table title search 
+| eval commands=commands(search) 
+| mvexpand commands 
+| stats dc(title) as UniqueSearches by commands 
+| sort - UniqueSearches limit=10</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="UniqueSearches">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Complex Searches</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| table title search 
+| eval commands=commands(search) 
+| mvexpand commands 
+| rename commands as strings 
+| lookup CommandNames strings OUTPUT complexity 
+| where complexity&gt;=0 
+| stats sum(complexity) as TotalComplexity by title 
+| sort - TotalComplexity limit=10</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="TotalComplexity">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Top 10 Long Queries</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| table title search 
+| eval LengthofQuery=len(search) 
+| sort - LengthofQuery limit=10| fields - search</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="LengthofQuery">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</dashboard>

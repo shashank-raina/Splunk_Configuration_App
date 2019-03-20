@@ -1,0 +1,284 @@
+<form>
+  <label>Views/Dashboards Overview</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="Apps" searchWhenChanged="true">
+      <label>App Context</label>
+      <choice value="-">All</choice>
+      <fieldForLabel>Apps</fieldForLabel>
+      <fieldForValue>Apps</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/data/ui/views|rename eai:acl.app as Apps| dedup Apps| table Apps</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <default>-</default>
+      <initialValue>-</initialValue>
+    </input>
+    <input type="dropdown" token="Owner" searchWhenChanged="true">
+      <label>Owner Context</label>
+      <choice value="-">All</choice>
+      <default>-</default>
+      <initialValue>-</initialValue>
+      <fieldForLabel>Owner</fieldForLabel>
+      <fieldForValue>Owner</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/data/ui/views|rename eai:acl.owner as Owner| dedup Owner| table Owner</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="dropdown" token="dashboardowner" searchWhenChanged="true">
+      <label>View/Dashboard Owner</label>
+      <choice value="*">All</choice>
+      <initialValue>*</initialValue>
+      <fieldForLabel>dashboardowner</fieldForLabel>
+      <fieldForValue>dashboardowner</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/data/ui/views|rename eai:acl.owner as dashboardowner| dedup dashboardowner| table dashboardowner</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+  </fieldset>
+  
+  <search id="rest_api_views">
+      <query>| rest /servicesNS/$Owner$/$Apps$/data/ui/views| search eai:acl.owner="$dashboardowner$"|</query>
+      <earliest>-15m@m</earliest>
+        <latest>now</latest>
+  </search>
+  
+  
+  <row>
+    <panel>
+      <single>
+        <title>No. of Dashboard Views</title>
+        <search base="rest_api_views">
+          <query>fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| search isDashboard=1| stats count</query>
+        
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xf7bc38","0xf7bc38"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="useColors">1</option>
+      </single>
+      <single>
+        <title>No. of Non Dashboard Views</title>
+        <search base="rest_api_views">
+          <query>fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| search isDashboard=0| stats count</query>
+       
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xf7bc38","0xf7bc38"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="useColors">1</option>
+      </single>
+      <single>
+        <title>Total Views</title>
+        <search base="rest_api_views">
+          <query>fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| stats count</query>
+          
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xf7bc38","0xf7bc38"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Permissions Sharing</title>
+        <search base="rest_api_views">
+          <query> fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| top eai:acl.sharing|rename eai:acl.sharing as sharing| eval sharing=sharing+" - "+count</query>
+           
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Enabled/Disabled Dashboards</title>
+        <search base="rest_api_views">
+          <query>fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| top disabled|eval disabled=if(disabled=0,"Enabled","Disabled")| eval disabled=disabled+" - "+count</query>
+           
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Distribution by Apps</title>
+        <search base="rest_api_views">
+          <query>fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| top limit=0 eai:acl.app| rename eai:acl.app as appName| eval appName=appName+" - "+count</query>
+    
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.07</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Visible/Not Visible</title>
+        <search base="rest_api_views">
+          <query> fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| top limit=0 isVisible|eval isVisible=if(isVisible=0,"Not Visible","Visible")| eval isVisible=isVisible+" - "+count</query>
+           
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Owners</title>
+        <search base="rest_api_views">
+          <query> fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| rename eai:acl.owner as owner| top limit=0 owner|  eval owner=owner+" - "+count</query>
+           
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Last Modified Date</title>
+      <chart>
+        <search base="rest_api_views">
+          <query> fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| rename eai:acl.app as AppName, eai:acl.owner as OwnerName, eai:acl.sharing as Sharing, eai:type as Type, label as Title|fillnull value="-" description | table Title,description,AppName, OwnerName, Sharing, Type, isDashboard, isVisible, updated| eval updatedtime=strptime(updated,"%Y-%m-%dT%H:%M:%S")| fillnull value=NA updatedtime| eval currenttime=now()| eval LastModified=if(updatedtime="NA","Never Modified",(currenttime-updatedtime)/60/60/24)| eval LastModified=case(LastModified&lt;=7,"Last 7 Days",LastModified&gt;7 AND LastModified&lt;=30,"Last 30 Days",LastModified&gt;30 AND LastModified&lt;=90,"Last 3 Months",LastModified&gt;90 AND LastModified&lt;=180, "Last 6 Months",LastModified&gt;180 AND LastModified&lt;=365,"Last 1 Year",LastModified="Never Modified","Never Modified",1=1, "More than 1 Year")| top limit=0 LastModified|eval percent=round(percent,1) |eval LastModified=LastModified." - ".count." - ".percent."%"</query>
+         
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 20 Clusters based on Dashboard Title</title>
+      <viz type="simple_xml_examples.tagcloud">
+        <search base="rest_api_views">
+          <query>fields disabled eai:acl.app eai:acl.owner eai:acl.sharing eai:type isDashboard isVisible label updated description| cluster t=0.4 showcount=true field=label match=termset | sort - cluster_count limit=20| fields label cluster_count</query>
+           
+        </search>
+        <option name="simple_xml_examples.tagcloud.labelField">label</option>
+        <option name="simple_xml_examples.tagcloud.maxFontSize">48</option>
+        <option name="simple_xml_examples.tagcloud.minFontSize">12</option>
+        <option name="simple_xml_examples.tagcloud.valueField">cluster_count</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Type of Dashboard</title>
+      <chart>
+        <search base="rest_api_views">
+          <query> top rootNode| eval percent=round(percent,1)|eval rootNode=rootNode+" - "+count+" - "+percent+"%"</query>
+          
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,432 @@
+<dashboard>
+  <label>Lookups</label>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner 
+| table author title Search_String App updated Owner 
+| rex field=Search_String "lookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookup_name&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| fields author,title,Search_String,App,lookup_name| eventstats count as TotalSearches| mvexpand lookup_name|dedup title lookup_name |eventstats dc(lookup_name) as NumberOfUniqueLookupsUsed,count as TotalLookupsUsed| eval AverageLookupsUsedPerSearch=round(TotalLookupsUsed/TotalSearches,0)| fields TotalLookupsUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of times Lookups Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner 
+| table author title Search_String App updated Owner 
+| rex field=Search_String "lookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookup_name&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| fields author,title,Search_String,App,lookup_name| eventstats count as TotalSearches| mvexpand lookup_name|dedup title lookup_name |eventstats dc(lookup_name) as NumberOfUniqueLookupsUsed,count as TotalLookupsUsed| eval AverageLookupsUsedPerSearch=round(TotalLookupsUsed/TotalSearches,0)| fields NumberOfUniqueLookupsUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of Unique Lookups Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/data/props/lookups 
+    | rename eai:acl.app as App 
+    | rename transform as lookup| stats dc(lookup)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. Of Lookups Defined</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner 
+| table author title Search_String App updated Owner 
+| rex field=Search_String "lookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookup_name&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| fields author,title,Search_String,App,lookup_name| eventstats count as TotalSearches| mvexpand lookup_name|dedup title lookup_name |eventstats dc(lookup_name) as NumberOfUniqueLookupsUsed,count as TotalLookupsUsed| eval AverageLookupsUsedPerSearch=round(TotalLookupsUsed/TotalSearches,2)| fields AverageLookupsUsedPerSearch</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of Unique Lookups Used Per Search</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "lookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookups&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| fields author,title,Search_String,App,lookups 
+| rename App as AppOfSearch 
+| mvexpand lookups 
+| dedup title lookups 
+| fields - Search_String 
+| join type=outer lookups 
+    [| rest /servicesNS/-/-/data/props/lookups 
+    | rename eai:acl.app as App 
+    | rename transform as lookups 
+    | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,lookups,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup lookups App Sharing 
+    | fields lookups App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by lookups 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOflookups] 
+| rename lookups as lookupsUsedInSavedSearch 
+| fillnull value="-- lookups Not Found --" AppOflookups 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOflookups="-- lookups Not Found --",AppOflookups,AppOfSearch=AppOflookups,"No",AppOfSearch!=AppOflookups,"Yes") 
+| eval PermissionIssue=if(AppOflookups="Global","No",PermissionIssue) 
+| search PermissionIssue="-- lookups Not Found --" 
+| stats dc(lookupsUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. Of Lookups Used BUT Not Defined</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "lookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookups&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| fields author,title,Search_String,App,lookups 
+| rename App as AppOfSearch 
+| mvexpand lookups 
+| dedup title lookups 
+| fields - Search_String 
+| join type=outer lookups 
+    [| rest /servicesNS/-/-/data/props/lookups 
+    | rename eai:acl.app as App 
+    | rename transform as lookups 
+    | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,lookups,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup lookups App Sharing 
+    | fields lookups App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by lookups 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOflookups] 
+| rename lookups as lookupsUsedInSavedSearch 
+| fillnull value="-- lookups Not Found --" AppOflookups 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOflookups="-- lookups Not Found --",AppOflookups,AppOfSearch=AppOflookups,"No",AppOfSearch!=AppOflookups,"Yes") 
+| eval PermissionIssue=if(AppOflookups="Global","No",PermissionIssue) 
+| search PermissionIssue="-- lookups Not Found --" 
+| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of times Undefined Lookups Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "lookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookups&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| fields author,title,Search_String,App,lookups 
+| rename App as AppOfSearch 
+| mvexpand lookups 
+| dedup title lookups 
+| fields - Search_String 
+| join type=outer lookups 
+    [| rest /servicesNS/-/-/data/props/lookups 
+    | rename eai:acl.app as App 
+    | rename transform as lookups 
+    | table App,author,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,lookups,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup lookups App Sharing 
+    | fields lookups App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by lookups 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOflookups] 
+| search lookups!="append=t*" 
+| rename lookups as lookupsUsedInSavedSearch 
+| fillnull value="-- lookups Not Found --" AppOflookups 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOflookups="-- lookups Not Found --",AppOflookups,AppOfSearch=AppOflookups,"No",AppOfSearch!=AppOflookups,"Yes") 
+| eval PermissionIssue=if(AppOflookups="Global","No",PermissionIssue) 
+| search PermissionIssue="Yes" 
+| stats dc(lookupsUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of Lookups Used with Sharing Issue</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "lookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookups&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| fields author,title,Search_String,App,lookups 
+| rename App as AppOfSearch 
+| mvexpand lookups 
+| dedup title lookups 
+| fields - Search_String 
+| join type=outer lookups 
+    [| rest /servicesNS/-/-/data/props/lookups 
+    | rename eai:acl.app as App 
+    | rename transform as lookups 
+    | table App,author,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,lookups,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup lookups App Sharing 
+    | fields lookups App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by lookups 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOflookups] 
+| search lookups!="append=t*" 
+| rename lookups as lookupsUsedInSavedSearch 
+| fillnull value="-- lookups Not Found --" AppOflookups 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOflookups="-- lookups Not Found --",AppOflookups,AppOfSearch=AppOflookups,"No",AppOfSearch!=AppOflookups,"Yes") 
+| eval PermissionIssue=if(AppOflookups="Global","No",PermissionIssue)| search PermissionIssue="Yes" 
+| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Times Lookups Used with Sharing Issue</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+
+| rex field=Search_String "lookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookups&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+
+| rename App as AppOfSearch 
+| mvexpand lookups| fields author,title,AppOfSearch,lookups,eai:acl.perms.read| dedup title lookups| rename eai:acl.perms.read as SearchRead| join outer maclookupsros [| rest /servicesNS/-/-/data/props/lookups  
+    | rename eai:acl.app as App    | rename transform as lookups | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,lookups,updated|rename eai:acl.sharing as Sharing| fields lookups App Sharing eai:acl.perms.read| rename eai:acl.perms.read as lookupsRead, App as AppOflookups]|eval PermissionIssue=if(match(SearchRead,lookupsRead),"No","Yes")| eval PermissionIssue=if(lookupsRead="*","No",PermissionIssue)| search PermissionIssue="Yes"| stats dc(lookups)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of Lookups with permission issue used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| rex field=Search_String "lookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookups&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookups&gt;[^\s]+)" max_match=100 
+| rename App as AppOfSearch 
+| mvexpand lookups 
+| fields author,title,AppOfSearch,lookups,eai:acl.perms.read 
+| dedup title lookups 
+| rename eai:acl.perms.read as SearchRead 
+| join outer maclookupsros 
+    [| rest /servicesNS/-/-/data/props/lookups 
+    | rename eai:acl.app as App 
+    | rename transform as lookups 
+    | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,lookups,updated 
+    | rename eai:acl.sharing as Sharing 
+    | fields lookups App Sharing eai:acl.perms.read 
+    | rename eai:acl.perms.read as lookupsRead, App as AppOflookups] 
+| eval PermissionIssue=if(match(SearchRead,lookupsRead),"No","Yes") 
+| eval PermissionIssue=if(lookupsRead="*","No",PermissionIssue) 
+| search PermissionIssue="Yes" 
+| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of times Lookups with Permission issue used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+</dashboard>

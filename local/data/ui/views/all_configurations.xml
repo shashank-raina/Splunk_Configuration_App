@@ -1,0 +1,99 @@
+<form>
+  <label>All Configurations Overview</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="apps" searchWhenChanged="true">
+      <label>Apps</label>
+      <choice value="*">All</choice>
+      <default>EQALIS_GPG13</default>
+      <initialValue>EQALIS_GPG13</initialValue>
+      <fieldForLabel>Apps</fieldForLabel>
+      <fieldForValue>Apps</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/admin/macros|rename eai:acl.app as Apps| dedup Apps| table Apps</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Configurations Created</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/admin/macros 
+| rename eai:acl.app as App 
+| table title,definition,App 
+| search App=$apps$ 
+| rename title as Macros_Defined 
+| append 
+    [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | table tag_name,title,App 
+    | search App=$apps$ 
+    | rename tag_name as Tags_Defined] 
+| append 
+    [| rest servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    | table title,search,App 
+    | search App=$apps$ 
+    | rename title as EventTypes_Defined] 
+| append 
+    [ rest /servicesNS/-/-/data/props/lookups 
+    | rename eai:acl.app as App 
+    | search App=$apps$ 
+    | rename transform as lookup 
+    | table lookup,App 
+    | append 
+        [| rest /servicesNS/-/-/data/transforms/lookups 
+        | rename eai:acl.app as App 
+        | search App=$apps$ 
+        | rename filename as lookup 
+        | table lookup,App] 
+        ] 
+| stats values(EventTypes_Defined) as EventTypes_Defined, values(lookup) as Lookups_Defined,values(Macros_Defined) as Macros_Defined,values(Tags_Defined) as Tags_Defined</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Configurations used in Saved Searches</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| search App=$apps$ 
+| rex field=Search_String "tag\=\"(?&lt;tag_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "\`(?&lt;macro_name&gt;[^\`]+)`" max_match=100 
+| rex field=Search_String "lookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookup_name&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100| fillnull value= eventtype_name tag_name macro_name lookup_name |mvexpand eventtype_name|mvexpand tag_name|mvexpand macro_name|mvexpand lookup_name|stats values(eventtype_name) as EventType_Used,values(lookup_name) as Lookups_Used,values(macro_name) as Macros_Used, values(tag_name) as Tags_Used</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

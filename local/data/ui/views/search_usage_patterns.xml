@@ -1,0 +1,86 @@
+<dashboard>
+  <label>Search Usage Patterns</label>
+  <row>
+    <panel>
+      <title>Top 10 Common Searches</title>
+      <table>
+        <search>
+          <query>index=_audit action=search (id=* OR search_id=*) 
+| eval search_id=if(isnull(search_id), id, search_id) 
+| replace '*' with * in search_id 
+| search search_id!=rt_* search_id!=searchparsetmp* 
+| rex "search='(?&lt;search&gt;.*?)', autojoin" 
+| rex "savedsearch_name=\"(?&lt;savedsearch_name&gt;.*?)\"\]\[" 
+| eval search=case(isnotnull(search),search,isnull(search) AND savedsearch_name!="","Scheduled search name : ".savedsearch_name,isnull(search) AND savedsearch_name=="","SID : ".search_id) 
+| convert num(total_run_time) 
+| eval user = if(user="n/a", "nobody", user) 
+| stats min(_time) as _time last(user) as user max(total_run_time) as total_run_time last(search) as search by search_id, savedsearch_name 
+| eval search=if(savedsearch_name="",search,savedsearch_name) 
+| search search_id=* search!=typeahead* 
+| stats count , median(total_run_time) as MedianRunTime by search 
+| sort - count| head 10</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="MedianRunTime">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Median Run Time Searches</title>
+      <table>
+        <search>
+          <query>index=_audit action=search (id=* OR search_id=*) 
+| eval search_id=if(isnull(search_id), id, search_id) 
+| replace '*' with * in search_id 
+| search search_id!=rt_* search_id!=searchparsetmp* 
+| rex "search='(?&lt;search&gt;.*?)', autojoin" 
+| rex "savedsearch_name=\"(?&lt;savedsearch_name&gt;.*?)\"\]\[" 
+| eval search=case(isnotnull(search),search,isnull(search) AND savedsearch_name!="","Scheduled search name : ".savedsearch_name,isnull(search) AND savedsearch_name=="","SID : ".search_id) 
+| convert num(total_run_time) 
+| eval user = if(user="n/a", "nobody", user) 
+| stats min(_time) as _time last(user) as user max(total_run_time) as total_run_time last(search) as search by search_id, savedsearch_name 
+| eval search=if(savedsearch_name="",search,savedsearch_name) 
+| search search_id=* search!=typeahead* 
+| stats count , median(total_run_time) as MedianRunTime by search 
+| sort - MedianRunTime 
+| head 10</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="MedianRunTime">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</dashboard>

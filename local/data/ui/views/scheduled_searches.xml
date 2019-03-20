@@ -1,0 +1,327 @@
+<form>
+  <label>Scheduled Searches</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>No. of Schedule Searches Hourly</title>
+        <search>
+          <query>index=_internal sourcetype=scheduler  run_time=* 
+| table _time user savedsearch_name status scheduled_time dispatch_time run_time result_count alert_actions app
+| eval ScheduleType=if(like(savedsearch_name,"%_ACCELERATE_DM%"),"DM Acceleration","Scheduled Search")| eval ScheduleType=if(alert_actions="summary_index","Summary Index",ScheduleType)| timechart count by ScheduleType span=1h</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Average Hourly Run Time - Seconds</title>
+      <single>
+        <search>
+          <query>index=_internal sourcetype=scheduler  run_time=* 
+| table _time user savedsearch_name status scheduled_time dispatch_time run_time result_count alert_actions app
+| eval ScheduleType=if(like(savedsearch_name,"%_ACCELERATE_DM%"),"DM Acceleration","Scheduled Search")| eval ScheduleType=if(alert_actions="summary_index","Summary Index",ScheduleType)| timechart avg(run_time) span=1h</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-1h</option>
+        <option name="underLabel">Trend Compared to 1 hour before</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Schedule Delay Profile</title>
+      <chart>
+        <search>
+          <query>index=_internal sourcetype=scheduler scheduled_time=* run_time=* 
+| eval time=strftime(_time,"%Y-%m-%d %H:%M:%S") 
+| eval delay_in_start = (dispatch_time - scheduled_time) 
+| eval scheduled_time=strftime(scheduled_time,"%Y-%m-%d %H:%M:%S") 
+| eval dispatch_time=strftime(dispatch_time,"%Y-%m-%d %H:%M:%S") 
+| table savedsearch_name,delay_in_start, scheduled_time, dispatch_time, time, run_time, status 
+| eval DelayProfile=case(delay_in_start=0,"No delay",delay_in_start&gt;0 AND delay_in_start&lt;5,"1-5s",delay_in_start&gt;=5 AND delay_in_start&lt;=10,"5-10s",delay_in_start&gt;10 AND delay_in_start&lt;=100,"10-100s",delay_in_start&gt;100,"&gt;100s") 
+| top DelayProfile 
+| eval percent=round(percent,2) 
+| eval DelayProfile=DelayProfile+" - "+count+" - "+percent+"%"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Type, Status and Count</title>
+      <viz type="parallel_coordinates_app.parallel_coordinates">
+        <search>
+          <query>index=_internal sourcetype=scheduler  
+| table _time user savedsearch_name status scheduled_time dispatch_time run_time result_count alert_actions app
+| eval ScheduleType=if(like(savedsearch_name,"%_ACCELERATE_DM%"),"DM Acceleration","Scheduled Search")| eval ScheduleType=if(alert_actions="summary_index","Summary Index",ScheduleType)| stats count by ScheduleType status</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="parallel_coordinates_app.parallel_coordinates.colorMode">categorical</option>
+        <option name="parallel_coordinates_app.parallel_coordinates.hideTicks">false</option>
+        <option name="parallel_coordinates_app.parallel_coordinates.maxCategories">25</option>
+        <option name="parallel_coordinates_app.parallel_coordinates.maxColor">#d93f3c</option>
+        <option name="parallel_coordinates_app.parallel_coordinates.minColor">#f58f39</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+  
+<body>
+
+<h1 align="center">WORST OFFENDERS</h1>
+
+</body>
+</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+  
+<body>
+</body>
+</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+  
+<body>
+
+<h1 align="center">Top 5 Average Run Times</h1>
+
+</body>
+</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title></title>
+      <table>
+        <search>
+          <query>index=_internal sourcetype=scheduler run_time=* 
+| table _time user savedsearch_name status scheduled_time dispatch_time run_time result_count alert_actions app 
+| eval ScheduleType=if(like(savedsearch_name,"%_ACCELERATE_DM%"),"DM Acceleration","Scheduled Search") 
+| eval ScheduleType=if(alert_actions="summary_index","Summary Index",ScheduleType) 
+| eventstats count as TotalRuns, avg(result_count) as AvgResultCount avg(run_time) as AvgRunTime,sum(run_time) as TotalRunTime, count(eval(run_time&gt;10)) as RunTimesMorethan10Sec by savedsearch_name 
+| fields user savedsearch_name ScheduleType app TotalRuns AvgResultCount AvgRunTime RunTimesMorethan10Sec TotalRunTime 
+| dedup savedsearch_name | rename ScheduleType as Type
+| sort - AvgRunTime | fields - _time 
+| head 5</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="AvgRunTime">
+          <colorPalette type="minMidMax" maxColor="#D93F3C" minColor="#ED8440"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+  
+<body>
+
+<h1 align="center">Maximum No. of Times Executed</h1>
+
+</body>
+</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title></title>
+      <table>
+        <search>
+          <query>index=_internal sourcetype=scheduler run_time=* 
+| table _time user savedsearch_name status scheduled_time dispatch_time run_time result_count alert_actions app 
+| eval ScheduleType=if(like(savedsearch_name,"%_ACCELERATE_DM%"),"DM Acceleration","Scheduled Search") 
+| eval ScheduleType=if(alert_actions="summary_index","Summary Index",ScheduleType) 
+| eventstats count as TotalRuns, avg(result_count) as AvgResultCount avg(run_time) as AvgRunTime,sum(run_time) as TotalRunTime, count(eval(run_time&gt;10)) as RunTimesMorethan10Sec by savedsearch_name 
+| fields user savedsearch_name ScheduleType app TotalRuns AvgResultCount AvgRunTime RunTimesMorethan10Sec TotalRunTime | eval AvgRunTime=round(AvgRunTime,2)| eval TotalRunTime=round(TotalRunTime,2)
+| dedup savedsearch_name | rename ScheduleType as Type
+| sort - TotalRuns | fields - _time 
+| head 5</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="TotalRuns">
+          <colorPalette type="minMidMax" maxColor="#D93F3C" minColor="#F7BC38"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+  
+<body>
+
+<h1 align="center">Total Run Time</h1>
+
+</body>
+</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title></title>
+      <table>
+        <search>
+          <query>index=_internal sourcetype=scheduler run_time=* 
+| table _time user savedsearch_name status scheduled_time dispatch_time run_time result_count alert_actions app 
+| eval ScheduleType=if(like(savedsearch_name,"%_ACCELERATE_DM%"),"DM Acceleration","Scheduled Search") 
+| eval ScheduleType=if(alert_actions="summary_index","Summary Index",ScheduleType) 
+| eventstats count as TotalRuns, avg(result_count) as AvgResultCount avg(run_time) as AvgRunTime,sum(run_time) as TotalRunTime, count(eval(run_time&gt;10)) as RunTimesMorethan10Sec by savedsearch_name 
+| fields user savedsearch_name ScheduleType app TotalRuns AvgResultCount AvgRunTime RunTimesMorethan10Sec TotalRunTime 
+| eval AvgRunTime=round(AvgRunTime,2) 
+| eval TotalRunTime=round(TotalRunTime,2) 
+| dedup savedsearch_name 
+| rename ScheduleType as Type 
+| sort - TotalRunTime 
+| fields - _time 
+| head 5</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="TotalRunTime">
+          <colorPalette type="minMidMax" maxColor="#D93F3C" minColor="#ED8440"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+  
+<body>
+
+<h1 align="center">Maximum No. of Run Times &gt; 10 Seconds</h1>
+
+</body>
+</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title></title>
+      <table>
+        <search>
+          <query>index=_internal sourcetype=scheduler run_time=* 
+| table _time user savedsearch_name status scheduled_time dispatch_time run_time result_count alert_actions app 
+| eval ScheduleType=if(like(savedsearch_name,"%_ACCELERATE_DM%"),"DM Acceleration","Scheduled Search") 
+| eval ScheduleType=if(alert_actions="summary_index","Summary Index",ScheduleType) 
+| eventstats count as TotalRuns, avg(result_count) as AvgResultCount avg(run_time) as AvgRunTime,sum(run_time) as TotalRunTime, count(eval(run_time&gt;10)) as RunTimesMorethan10Sec by savedsearch_name 
+| fields user savedsearch_name ScheduleType app TotalRuns AvgResultCount AvgRunTime RunTimesMorethan10Sec TotalRunTime 
+| eval AvgRunTime=round(AvgRunTime,2) 
+| eval TotalRunTime=round(TotalRunTime,2) 
+| dedup savedsearch_name 
+| rename ScheduleType as Type 
+| sort - RunTimesMorethan10Sec 
+| fields - _time 
+| head 5</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="RunTimesMorethan10Sec">
+          <colorPalette type="minMidMax" maxColor="#D93F3C" minColor="#ED8440"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

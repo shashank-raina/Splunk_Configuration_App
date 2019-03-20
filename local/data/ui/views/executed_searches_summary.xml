@@ -1,0 +1,151 @@
+<form>
+  <label>Executed Searches Summary</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Avg Run Time in Seconds for Adhoc Searches</title>
+      <single>
+        <search>
+          <query>index=_audit action=search info=completed scan_count&gt;0 savedsearch_name=""| timechart avg(total_run_time) as avgruntime| eval avgruntime=round(avgruntime,2)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-1h</option>
+        <option name="underLabel">Avg Runtime compared to 1 hour before</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Avg Run Time in Seconds for Saved Searches</title>
+      <single>
+        <search>
+          <query>index=_audit action=search info=completed scan_count&gt;0 savedsearch_name!=""| timechart  avg(total_run_time) as avgruntime| eval avgruntime=round(avgruntime,2)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="underLabel">Avg Runtime compared to 1 hour before</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Percentage of Saved Searches using &lt;10% of scanned events</title>
+      <single>
+        <search>
+          <query>index=_audit action=search info=completed scan_count&gt;0 savedsearch_name!=""
+| stats max(scan_count) as scan_count, max(event_count) as event_count by savedsearch_name | eval percent_events_used = event_count / scan_count *100
+| fields percent_events_used, scan_count, event_count, savedsearch_name 
+| sort percent_events_used| stats count as Total, count(eval(percent_events_used&lt;10)) as Offenders| eval percent=round(Offenders/Total*100,2)| fields percent</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[10,30,70]</option>
+        <option name="unit">%</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Percentage of Adhoc Searches using &lt;10% of scanned events</title>
+      <single>
+        <search>
+          <query>index=_audit action=search info=completed scan_count&gt;0 savedsearch_name=""
+| stats max(scan_count) as scan_count, max(event_count) as event_count by search_id | eval percent_events_used = event_count / scan_count *100
+| fields percent_events_used, scan_count, event_count, savedsearch_name 
+| sort percent_events_used| stats count as Total, count(eval(percent_events_used&lt;10)) as Offenders| eval percent=round(Offenders/Total*100,2)| fields percent</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[10,30,70]</option>
+        <option name="unit">%</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Failed Adhoc Searches</title>
+      <single>
+        <search>
+          <query>index=_audit action=search savedsearch_name=""| timechart count as Total, count(eval(info="failed")) as Failed| eval percent=round(Failed/Total*100,2)| fields percent</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-1h</option>
+        <option name="underLabel">Compared to 1 hour ago</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Failed Saved Searches</title>
+      <single>
+        <search>
+          <query>index=_audit action=search savedsearch_name!=""| timechart count as Total, count(eval(info="failed")) as Failed| eval percent=round(Failed/Total*100,2)| fields percent</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-1h</option>
+        <option name="underLabel">Compared to 1 hour before</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+</form>

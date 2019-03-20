@@ -1,0 +1,132 @@
+<dashboard>
+  <label>System Check</label>
+  <row>
+    <panel>
+      <title>Concurrent Searches</title>
+      <single>
+        <search>
+          <query>index=_audit action=search ( info=granted OR info=completed) search_id=* | stats first(total_run_time) as run_time last(_time) as _time by search_id | concurrency duration=run_time | eval cores=[ search earliest=1 index=_internal sourcetype="splunkd"  log_level="INFO" component="loader" detected | rex "(?i)Detected (?P&lt;cores&gt;[^ ]+)" | rename cores as search | fields - _* | stats first(search) as search by splunk_server | stats sum(search) as search ] | eval max_concurrent_searches=(cores*4) + 4 | timechart perc95(concurrency) max(concurrency) first(max_concurrent_searches) as "max concurrent searches"|search _time=*| fields "max concurrent searches"</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="showSparkline">0</option>
+        <option name="showTrendIndicator">0</option>
+        <option name="underLabel">Max Concurrent Searches: 4 * (numberOfCores + 1)</option>
+      </single>
+      <single>
+        <search>
+          <query>index=_audit action=search ( info=granted OR info=completed) search_id=* | stats first(total_run_time) as run_time last(_time) as _time by search_id | concurrency duration=run_time | eval cores=[ search earliest=1 index=_internal sourcetype="splunkd"  log_level="INFO" component="loader" detected | rex "(?i)Detected (?P&lt;cores&gt;[^ ]+)" | rename cores as search | fields - _* | stats first(search) as search by splunk_server | stats sum(search) as search ] | eval max_concurrent_searches=(cores*4) + 4 | timechart perc95(concurrency) max(concurrency) first(max_concurrent_searches) as "max concurrent searches"|head 1| fields max(concurrency)</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="showTrendIndicator">0</option>
+        <option name="underLabel">Most Recent Maximum Concurrent Searches</option>
+      </single>
+      <single>
+        <search>
+          <query>index=_audit action=search ( info=granted OR info=completed) search_id=* | stats first(total_run_time) as run_time last(_time) as _time by search_id | concurrency duration=run_time | eval cores=[ search earliest=1 index=_internal sourcetype="splunkd"  log_level="INFO" component="loader" detected | rex "(?i)Detected (?P&lt;cores&gt;[^ ]+)" | rename cores as search | fields - _* | stats first(search) as search by splunk_server | stats sum(search) as search ] | eval max_concurrent_searches=(cores*4) + 4 | timechart perc95(concurrency) max(concurrency) first(max_concurrent_searches) as "max concurrent searches"| sort - max(concurrency)|head 1| fields max(concurrency)</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="showTrendIndicator">0</option>
+        <option name="underLabel">Maximum Concurrent Searches in last 24 Hours</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Events per second retrieved off disk</title>
+      <single>
+        <search>
+          <query>index=_audit action=search ( info=granted OR info=completed) 
+| eval user=if(user="n/a", null, user) 
+| stats last(user) as user first(total_run_time) as run_time last(_time) as _time first(scan_count) as scan_count by search_id 
+| search scan_count&gt;10 run_time&gt;2 
+| eval eps=scan_count/run_time 
+| stats avg(eps) as avg_eps| eval avg_eps=round(avg_eps,2)</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Saved Searches Using less than 10% of Scanned Events in last 24 hours</title>
+      <single>
+        <search>
+          <query>index=_audit action=search info=completed scan_count&gt;0 savedsearch_name=* NOT savedsearch_name="" 
+| stats max(scan_count) as scan_count, max(event_count) as event_count by savedsearch_name 
+| eval percent_events_used = event_count / scan_count *100
+| fields percent_events_used, scan_count, event_count, savedsearch_name 
+| sort percent_events_used| stats count as Total, count(eval(percent_events_used&lt;10)) as Offenders| eval percent=round(Offenders/Total*100,2)| fields percent</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,15,30,65]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unit">%</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Individual files being monitored</title>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/data/inputs/monitor| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,10,30,50]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+</dashboard>

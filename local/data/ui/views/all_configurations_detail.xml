@@ -1,0 +1,85 @@
+<form>
+  <label>All Saved Configurations Detail</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="apps" searchWhenChanged="true">
+      <label>Apps</label>
+      <choice value="*">All</choice>
+      <default>EQALIS_GPG13</default>
+      <initialValue>EQALIS_GPG13</initialValue>
+      <fieldForLabel>Apps</fieldForLabel>
+      <fieldForValue>Apps</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/admin/macros|rename eai:acl.app as Apps| dedup Apps| table Apps</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Macros</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/admin/macros 
+| rename eai:acl.app as App 
+| search App=$apps$| table title,eai:acl.sharing,eai:acl.perms.write,eai:acl.perms.read,eai:acl.owner,definition,App,updated,disabled| rename title as Title, definition as Definition,eai:acl.sharing as Sharing, eai:acl.perms.write as Write_Permissions, eai:acl.perms.read as Read_Permissions, eai:acl.owner as Owner| eval updatedtime=strptime(updated,"%Y-%m-%dT%H:%M:%S")| fillnull value=NA updatedtime| eval currenttime=now()| eval LastModified=if(updatedtime="NA","Never Modified",(currenttime-updatedtime)/60/60/24)| fields - updated,currenttime,updatedtime</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Tags</title>
+        <search>
+          <query>| rest /servicesNS/-/-/admin/tags 
+| rename eai:acl.app as App 
+| search App=$apps$| table tag_name,title,eai:acl.sharing,eai:acl.perms.write,eai:acl.perms.read,eai:acl.owner,field_name_value,updated,disabled| rename title as Title, definition as Definition,eai:acl.sharing as Sharing, eai:acl.perms.write as Write_Permissions, eai:acl.perms.read as Read_Permissions, eai:acl.owner as Owner| eval updatedtime=strptime(updated,"%Y-%m-%dT%H:%M:%S")| fillnull value=NA updatedtime| eval currenttime=now()| eval LastModified=if(updatedtime="NA","Never Modified",(currenttime-updatedtime)/60/60/24)| fields - updated,currenttime,updatedtime</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Eventtypes</title>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/admin/eventtypes 
+| rename eai:acl.app as App 
+| search App=$apps$| table title,tags,eai:acl.sharing,eai:acl.perms.write,eai:acl.perms.read,eai:acl.owner,search,App,updated,disabled| rename title as Title, definition as Definition,eai:acl.sharing as Sharing, eai:acl.perms.write as Write_Permissions, eai:acl.perms.read as Read_Permissions, eai:acl.owner as Owner| eval updatedtime=strptime(updated,"%Y-%m-%dT%H:%M:%S")| fillnull value=NA updatedtime| eval currenttime=now()| eval LastModified=if(updatedtime="NA","Never Modified",(currenttime-updatedtime)/60/60/24)| fields - updated,currenttime,updatedtime</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Lookups</title>
+        <search>
+          <query>|rest /servicesNS/-/-/data/transforms/lookups
+| rename eai:acl.app as App 
+| search App=$apps$| table title,type,filename,fields_list,fields_array,eai:acl.sharing,eai:acl.perms.write,eai:acl.perms.read,eai:acl.owner,search,App,updated,disabled| rename title as Title, definition as Definition,eai:acl.sharing as Sharing, eai:acl.perms.write as Write_Permissions, eai:acl.perms.read as Read_Permissions, eai:acl.owner as Owner| eval updatedtime=strptime(updated,"%Y-%m-%dT%H:%M:%S")| fillnull value=NA updatedtime| eval currenttime=now()| eval LastModified=if(updatedtime="NA","Never Modified",(currenttime-updatedtime)/60/60/24)| fields - updated,currenttime,updatedtime</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

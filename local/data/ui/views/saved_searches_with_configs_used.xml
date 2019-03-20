@@ -1,0 +1,95 @@
+<form>
+  <label>Saved Searches with Configs Used</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="app" searchWhenChanged="true">
+      <label>App</label>
+      <choice value="*">All</choice>
+      <default>EQALIS_GPG13</default>
+      <initialValue>EQALIS_GPG13</initialValue>
+      <fieldForLabel>App</fieldForLabel>
+      <fieldForValue>App</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App| dedup App</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="text" token="title" searchWhenChanged="true">
+      <label>Title</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="dropdown" token="author" searchWhenChanged="true">
+      <label>Author</label>
+      <choice value="*">All</choice>
+      <initialValue>*</initialValue>
+      <fieldForLabel>Author</fieldForLabel>
+      <fieldForValue>Author</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/saved/searches 
+| rename author as Author| dedup Author</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="dropdown" token="owner" searchWhenChanged="true">
+      <label>Owner</label>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <fieldForLabel>Owner</fieldForLabel>
+      <fieldForValue>Owner</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner | dedup Owner</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="text" token="search" searchWhenChanged="true">
+      <label>Search String</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner 
+| search App="$app$" title="*$title$*" Search_String="*$search$*" author="$author$" Owner="$owner$"
+| table author title Search_String App updated Owner 
+| rex field=Search_String "tag\=\"(?&lt;tag_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "\`(?&lt;macro_name&gt;[^\`]+)`" max_match=100 
+| rex field=Search_String "lookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| rex field=Search_String ".*lookup\s(?&lt;lookup_name&gt;[^\]]+)\]" max_match=100 
+| rex field=Search_String "inputlookup\s(?&lt;lookup_name&gt;[^\s]+)" max_match=100 
+| fillnull value=- eventtype_name tag_name macro_name lookup_name 
+| eval updatedtime=strptime(updated,"%Y-%m-%dT%H:%M:%S") 
+| fillnull value=NA updatedtime 
+| eval currenttime=now() 
+| eval LastModified=if(updatedtime="NA","Never Modified",(currenttime-updatedtime)/60/60/24) 
+| eval updatedDate=strftime(updatedtime,"%Y-%m-%d") 
+| eval updatedTime=strftime(updatedtime,"%X") 
+| fields - updated,LastModified,currenttime,updatedtime 
+| fillnull value="Never Modified" updatedDate,updatedTime</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

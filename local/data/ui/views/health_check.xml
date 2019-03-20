@@ -1,0 +1,82 @@
+<form stylesheet="simple_xml_examples:custom_decorations.css" script="drilldown.js">
+  <label>Health Check</label>
+  <search id="baseSearch">
+    <query>
+      index=_audit action=search info=completed scan_count&gt;0 
+| eval savedsearch_name=if(savedsearch_name="",search_id,savedsearch_name) 
+| stats max(scan_count) as scan_count, max(event_count) as event_count by savedsearch_name 
+| eval percent_events_used = event_count / scan_count *100 
+| fields percent_events_used, scan_count, event_count, savedsearch_name 
+| sort percent_events_used 
+| stats count as Total, count(eval(percent_events_used&lt;10)) as Offenders 
+| eval percent=round(Offenders/Total*100,2) 
+| fields percent | eval percent=round(100-percent,0)
+| rangemap field=percent severe=0-10 high=10-55 elevated=55-70 low=70-100  
+| eval Message=case(range="low","This health check item was successful. Everything is good here.",range="elevated","30-50% of saved searches are using &lt;10% of scanned events",range="high","Saved searches using &lt;10% of scanned events",range="severe","70%-100% of saved searches are using less than 10% of scanned events") 
+| eval type=case(range="low","Success",range="elevated","Info",range="high","Warning",range="severe","Errors") 
+| eval HealthItem="Super Sparse Searches" 
+| eval Message=if("$field1$"="yes",Message,"-") 
+| eval HealthItem=if("$field1$"="yes",HealthItem,"-") 
+| eval type=if("$field1$"="yes",type,"-") 
+| eval range=if("$field1$"="yes",range,"-")| eval Category=if("$field1$"="yes","Search Optimization","-")| eval percent=if("$field1$"="yes",percent,"-")
+    </query>
+    <earliest>-24h@h</earliest>
+    <latest>now</latest>
+  </search>
+  <description>Select the "Yes" Radio Button to start the Health Check</description>
+  <search base="baseSearch">
+    <query>| fields percent range</query>
+    <progress>
+      <set token="value1">$result.percent$</set>
+      <set token="range1">$result.range$</set>
+    </progress>
+  </search>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="radio" token="field1">
+      <label>Start the Health Check</label>
+      <choice value="yes">Yes</choice>
+      <choice value="no">No</choice>
+      <default>no</default>
+      <initialValue>no</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Category</title>
+      <single>
+        <search base="baseSearch">
+          <query>| fields Category</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <title>Check</title>
+      <single>
+        <search base="baseSearch">
+          <query>| fields HealthItem</query>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <title>Summary</title>
+      <single>
+        <search base="baseSearch">
+          <query>| fields type</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100,200]</option>
+        <option name="useColors">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Score (out of 100)</title>
+      <html>
+                <div class="custom-result-value $range1$">
+                    $value1$
+                    
+                </div>
+            </html>
+    </panel>
+  </row>
+</form>

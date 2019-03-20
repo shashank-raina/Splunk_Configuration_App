@@ -1,0 +1,113 @@
+<form>
+  <label>Data Inputs</label>
+  <fieldset submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <title>Type of Enabled Data Inputs (Trellis Layout for All Hosts)</title>
+      <chart>
+        <title>Click a pie slice to view inputs. Then click an input to view details.</title>
+        <search>
+          <query>|rest /services/data/inputs/all| where disabled=0|rename eai:type as type|chart count by type host</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">large</option>
+        <option name="trellis.splitBy">host</option>
+        <drilldown>
+          <set token="host">$trellis.value$</set>
+          <set token="type">$click.value$</set>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Data Inputs</title>
+      <input type="text" token="field1">
+        <label>Selected Host</label>
+        <default>$host$</default>
+      </input>
+      <input type="text" token="field2">
+        <label>Selected Type</label>
+        <default>$type$</default>
+      </input>
+      <input type="text" token="titles" searchWhenChanged="true">
+        <label>Search for any data input</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Click any type of input in the pie chart above</title>
+        <search>
+          <query>|rest /services/data/inputs/all|search host="$host$" eai:type="$type$" title="*$titles$*"| where disabled=0|rename eai:type as type, eai:acl.app as app| table title type</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <set token="title">$click.value$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <title>This panel displays details for data inputs.</title>
+      <table>
+        <title>Click the details list in the panel on the left to populate this panel with details of the clicked item.</title>
+        <search>
+          <query>|rest /services/data/inputs/all|search title="$title$" |rename eai:type as type, eai:acl.app as app| table title app author index source sourcetype interval eai:acl.perms.read eai:acl.perms.write eai:acl.sharing| fillnull value="-"|rename title as Name| transpose|rename column as Field, "row 1" as Value</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Input errors - last 24h</title>
+      <table>
+        <title>The host will be reflected of the type chosen in the pie chart above</title>
+        <search>
+          <query>index=_internal host="$host$" source=*splunkd.log `input_components` log_level=ERROR
+                | cluster showcount=t | rename cluster_count AS count _raw AS message| table count, message | sort - count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

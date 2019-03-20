@@ -1,0 +1,22 @@
+<dashboard>
+  <label>Deployment Information</label>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| rest /servicesNS/-/-/server/info | fields activeLicenseGroup build cpu_arch license_labels numberOfCores numberOfVirtualCores os_build os_version physicalMemoryMB server_roles serverName| join serverName [| rest /servicesNS/-/-/server/settings| fields splunk_server SPLUNK_DB SPLUNK_HOME appServerPorts host_resolved kvStorePort mgmtHostPort pass4SymmKey serverName]| mvexpand server_roles|fields - _timediff _mkv_child | table server_roles serverName  *|transpose</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

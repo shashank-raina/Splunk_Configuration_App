@@ -1,0 +1,456 @@
+<dashboard>
+  <label>TAGS</label>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| eventstats count as TotalSearches 
+| mvexpand tags | dedup title tags
+| eventstats dc(tags) as NumberOfUniqueTagsUsed,count as TotalTagsUsed 
+| eval AverageTagsUsedPerSearch=round(TotalTagsUsed/TotalSearches,0) 
+| fields TotalTagsUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. Of times Tags Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| eventstats count as TotalSearches 
+| mvexpand tags | dedup tags title
+| eventstats dc(tags) as NumberOfUniqueTagsUsed,count as TotalTagsUsed 
+| eval AverageTagsUsedPerSearch=round(TotalTagsUsed/TotalSearches,0) 
+| fields NumberOfUniqueTagsUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. Of Unique Tags Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| eventstats count as TotalSearches 
+| mvexpand tags | dedup title tags
+| eventstats dc(tags) as NumberOfUniqueTagsUsed,count as TotalTagsUsed 
+| eval AverageTagsUsedPerSearch=round(TotalTagsUsed/TotalSearches,2) 
+| fields AverageTagsUsedPerSearch</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Average Tags Used Per Search</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | rename tag_name as tags| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated| stats dc(tags) as NumberOfTagsDefined</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Number Of Tags Defined</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| rename App as AppOfSearch 
+| mvexpand tags 
+| fields - Search_String 
+| join type=outer tags 
+    [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | rename tag_name as tags| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated|rename eai:acl.sharing as Sharing| dedup tags App Sharing| fields tags App Sharing| stats values(App) as App, values(Sharing) as Sharing by tags| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfTag] 
+| rename tags as TagUsedInSavedSearch 
+|fillnull value="-- Tag Not Found --" AppOfTag| fields - Sharing| eval PermissionIssue=case(AppOfTag="-- Tag Not Found --",AppOfTag,AppOfSearch=AppOfTag,"No",AppOfSearch!=AppOfTag,"Yes")| eval PermissionIssue=if(AppOfTag="Global","No",PermissionIssue)| search PermissionIssue="-- Tag Not Found --"| stats dc(TagUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. Of Tags Used BUT Not Defined</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <drilldown>
+          <link target="_blank">/app/configuration_explorer/report?s=Searches with Tags not defined</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| rename App as AppOfSearch 
+| mvexpand tags 
+| fields - Search_String 
+| join type=outer tags 
+    [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | rename tag_name as tags| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated|rename eai:acl.sharing as Sharing| dedup tags App Sharing| fields tags App Sharing| stats values(App) as App, values(Sharing) as Sharing by tags| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfTag] 
+| rename tags as TagUsedInSavedSearch 
+|fillnull value="-- Tag Not Found --" AppOfTag| fields - Sharing| eval PermissionIssue=case(AppOfTag="-- Tag Not Found --",AppOfTag,AppOfSearch=AppOfTag,"No",AppOfSearch!=AppOfTag,"Yes")| eval PermissionIssue=if(AppOfTag="Global","No",PermissionIssue)| search PermissionIssue="-- Tag Not Found --"| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Undefined Tags Used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| rename App as AppOfSearch 
+| mvexpand tags 
+| dedup title tags 
+| fields - Search_String 
+| join type=outer tags 
+    [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | rename tag_name as tags 
+    | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup tags App Sharing 
+    | fields tags App Sharing disabled 
+    | stats values(App) as App, values(Sharing) as Sharing, values(disabled) as disabled by tags 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOfTag] 
+| rename tags as TagUsedInSavedSearch 
+| fillnull value="-- Tag Not Found --" AppOfTag 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOfTag="-- Tag Not Found --",AppOfTag,AppOfSearch=AppOfTag,"No",AppOfSearch!=AppOfTag,"Yes") 
+| eval PermissionIssue=if(AppOfTag="Global","No",PermissionIssue) 
+| search disabled=1 
+| stats dc(TagUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No.of Disabled Tags Used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| rename App as AppOfSearch 
+| mvexpand tags 
+| dedup title tags 
+| fields - Search_String 
+| join type=outer tags 
+    [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | rename tag_name as tags 
+    | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup tags App Sharing 
+    | fields tags App Sharing disabled 
+    | stats values(App) as App, values(Sharing) as Sharing, values(disabled) as disabled by tags 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOfTag] 
+| rename tags as TagUsedInSavedSearch 
+| fillnull value="-- Tag Not Found --" AppOfTag 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOfTag="-- Tag Not Found --",AppOfTag,AppOfSearch=AppOfTag,"No",AppOfSearch!=AppOfTag,"Yes") 
+| eval PermissionIssue=if(AppOfTag="Global","No",PermissionIssue) 
+| search disabled=1 
+| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Disabled Tags used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| rename App as AppOfSearch 
+| mvexpand tags 
+| fields - Search_String 
+| join type=outer tags 
+    [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | rename tag_name as tags| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated|rename eai:acl.sharing as Sharing| dedup tags App Sharing| fields tags App Sharing| stats values(App) as App, values(Sharing) as Sharing by tags| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfTag] 
+| rename tags as TagUsedInSavedSearch 
+|fillnull value="-- Tag Not Found --" AppOfTag| fields - Sharing| eval PermissionIssue=case(AppOfTag="-- Tag Not Found --",AppOfTag,AppOfSearch=AppOfTag,"No",AppOfSearch!=AppOfTag,"Yes")| eval PermissionIssue=if(AppOfTag="Global","No",PermissionIssue)| search PermissionIssue="Yes"| stats dc(TagUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of Tags Used with Sharing Issue</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <drilldown>
+          <link target="_blank">/app/configuration_explorer/report?s=Searches with Tags having permission issue</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4)) 
+| fields author,title,Search_String,App,tags 
+| rename App as AppOfSearch 
+| mvexpand tags 
+| fields - Search_String 
+| join type=outer tags 
+    [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App 
+    | rename tag_name as tags| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated|rename eai:acl.sharing as Sharing| dedup tags App Sharing| fields tags App Sharing| stats values(App) as App, values(Sharing) as Sharing by tags| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfTag] 
+| rename tags as TagUsedInSavedSearch 
+|fillnull value="-- Tag Not Found --" AppOfTag| fields - Sharing| eval PermissionIssue=case(AppOfTag="-- Tag Not Found --",AppOfTag,AppOfSearch=AppOfTag,"No",AppOfSearch!=AppOfTag,"Yes")| eval PermissionIssue=if(AppOfTag="Global","No",PermissionIssue)| search PermissionIssue="Yes"| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Sharing issue Tags Used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4))
+
+| rename App as AppOfSearch 
+| mvexpand tags|  dedup title tags|fields author,title,AppOfSearch,tags,eai:acl.perms.read| rename eai:acl.perms.read as SearchRead| join outer tags [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App  | rename tag_name as tags | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated|rename eai:acl.sharing as Sharing| fields tags App Sharing disabled eai:acl.perms.read| rename eai:acl.perms.read as TagsRead, App as AppOfTags]|eval PermissionIssue=if(match(SearchRead,TagsRead),"No","Yes")| eval PermissionIssue=if(TagsRead="*","No",PermissionIssue)| search PermissionIssue="Yes"| stats dc(tags)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Tags used with Permission issue</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+
+| rex field=Search_String "tag\=\"(?&lt;tag_name1&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\=(?&lt;tag_name2&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=\"(?&lt;tag_name3&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "tag\:\:eventtype\=(?&lt;tag_name4&gt;\w+[-\w+]+)" max_match=100 
+| eval tags=mvdedup(mvappend(tag_name1,tag_name2,tag_name3,tag_name4))
+
+| rename App as AppOfSearch 
+| mvexpand tags|  dedup title tags|fields author,title,AppOfSearch,tags,eai:acl.perms.read| rename eai:acl.perms.read as SearchRead| join outer tags [| rest /servicesNS/-/-/admin/tags 
+    | rename eai:acl.app as App  | rename tag_name as tags | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,tags,updated|rename eai:acl.sharing as Sharing| fields tags App Sharing disabled eai:acl.perms.read| rename eai:acl.perms.read as TagsRead, App as AppOfTags]|eval PermissionIssue=if(match(SearchRead,TagsRead),"No","Yes")| eval PermissionIssue=if(TagsRead="*","No",PermissionIssue)| search PermissionIssue="Yes"| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Tags with permission issue used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+</dashboard>

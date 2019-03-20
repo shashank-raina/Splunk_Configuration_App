@@ -1,0 +1,332 @@
+<dashboard>
+  <label>MACROS</label>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros| eventstats count as TotalSearches| mvexpand macros|dedup title macros |eventstats dc(macros) as NumberOfUniquemacrosUsed,count as TotalmacrosUsed| eval AveragemacrosUsedPerSearch=round(TotalmacrosUsed/TotalSearches,0)| fields TotalmacrosUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of times Macros Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros| eventstats count as TotalSearches| mvexpand macros| dedup title macros |eventstats dc(macros) as NumberOfUniquemacrosUsed,count as TotalmacrosUsed| eval AveragemacrosUsedPerSearch=round(TotalmacrosUsed/TotalSearches,0)| fields NumberOfUniquemacrosUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of Unique Macros Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros| eventstats count as TotalSearches| mvexpand macros| dedup title macros| eventstats dc(macros) as NumberOfUniquemacrosUsed,count as TotalmacrosUsed| eval AveragemacrosUsedPerSearch=round(TotalmacrosUsed/TotalSearches,2)| fields AveragemacrosUsedPerSearch</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. of Unique Macros Used Per Search</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated| stats dc(macros) as NumberOfMacrosDefined</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No. Of Macros Defined</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros
+| rename App as AppOfSearch 
+| mvexpand macros | dedup title macros
+| fields - Search_String 
+| join type=outer macros 
+    [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| dedup macros App Sharing| fields macros App Sharing| stats values(App) as App, values(Sharing) as Sharing by macros| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfmacros] 
+| rename macros as macrosUsedInSavedSearch 
+|fillnull value="-- macros Not Found --" AppOfmacros| fields - Sharing| eval PermissionIssue=case(AppOfmacros="-- macros Not Found --",AppOfmacros,AppOfSearch=AppOfmacros,"No",AppOfSearch!=AppOfmacros,"Yes")| eval PermissionIssue=if(AppOfmacros="Global","No",PermissionIssue)| search PermissionIssue="-- macros Not Found --"| stats dc(macrosUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. Of Macros Used BUT Not Defined</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros
+| rename App as AppOfSearch 
+| mvexpand macros | dedup title macros
+| fields - Search_String 
+| join type=outer macros 
+    [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| dedup macros App Sharing| fields macros App Sharing| stats values(App) as App, values(Sharing) as Sharing by macros| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfmacros] 
+| rename macros as macrosUsedInSavedSearch 
+|fillnull value="-- macros Not Found --" AppOfmacros| fields - Sharing| eval PermissionIssue=case(AppOfmacros="-- macros Not Found --",AppOfmacros,AppOfSearch=AppOfmacros,"No",AppOfSearch!=AppOfmacros,"Yes")| eval PermissionIssue=if(AppOfmacros="Global","No",PermissionIssue)| search PermissionIssue="-- macros Not Found --"| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Undefined Macros Used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros
+| rename App as AppOfSearch 
+| mvexpand macros | dedup title macros
+| fields - Search_String 
+| join type=outer macros 
+    [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| dedup macros App Sharing| fields macros App Sharing disabled| stats values(App) as App, values(Sharing) as Sharing values(disabled) as disabled by macros| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfmacros] 
+| rename macros as macrosUsedInSavedSearch 
+|fillnull value="-- macros Not Found --" AppOfmacros| fields - Sharing| eval PermissionIssue=case(AppOfmacros="-- macros Not Found --",AppOfmacros,AppOfSearch=AppOfmacros,"No",AppOfSearch!=AppOfmacros,"Yes")| eval PermissionIssue=if(AppOfmacros="Global","No",PermissionIssue)|search disabled=1| stats dc(macrosUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Disabled Macros used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros
+| rename App as AppOfSearch 
+| mvexpand macros | dedup title macros
+| fields - Search_String 
+| join type=outer macros 
+    [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| dedup macros App Sharing| fields macros App Sharing disabled| stats values(App) as App, values(Sharing) as Sharing values(disabled) as disabled by macros| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfmacros] 
+| rename macros as macrosUsedInSavedSearch 
+|fillnull value="-- macros Not Found --" AppOfmacros| fields - Sharing| eval PermissionIssue=case(AppOfmacros="-- macros Not Found --",AppOfmacros,AppOfSearch=AppOfmacros,"No",AppOfSearch!=AppOfmacros,"Yes")| eval PermissionIssue=if(AppOfmacros="Global","No",PermissionIssue)|search disabled=1| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Disabled Macros used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros
+| rename App as AppOfSearch 
+| mvexpand macros 
+| fields - Search_String 
+| join type=outer macros 
+    [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| dedup macros App Sharing| fields macros App Sharing| stats values(App) as App, values(Sharing) as Sharing by macros| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfmacros] 
+| rename macros as macrosUsedInSavedSearch 
+|fillnull value="-- macros Not Found --" AppOfmacros| fields - Sharing| eval PermissionIssue=case(AppOfmacros="-- macros Not Found --",AppOfmacros,AppOfSearch=AppOfmacros,"No",AppOfSearch!=AppOfmacros,"Yes")| eval PermissionIssue=if(AppOfmacros="Global","No",PermissionIssue)| search PermissionIssue="Yes"| stats dc(macrosUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Macros Used with Sharing Issue</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+| fields author,title,Search_String,App,macros
+| rename App as AppOfSearch 
+| mvexpand macros 
+| fields - Search_String 
+| join type=outer macros 
+    [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| dedup macros App Sharing| fields macros App Sharing| stats values(App) as App, values(Sharing) as Sharing by macros| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfmacros] 
+| rename macros as macrosUsedInSavedSearch 
+|fillnull value="-- macros Not Found --" AppOfmacros| fields - Sharing| eval PermissionIssue=case(AppOfmacros="-- macros Not Found --",AppOfmacros,AppOfSearch=AppOfmacros,"No",AppOfSearch!=AppOfmacros,"Yes")| eval PermissionIssue=if(AppOfmacros="Global","No",PermissionIssue)| search PermissionIssue="Yes"| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Times Macros Used with Sharing Issue</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+
+| rename App as AppOfSearch 
+| mvexpand macros| fields author,title,AppOfSearch,macros,eai:acl.perms.read| dedup title macros| rename eai:acl.perms.read as SearchRead| join outer macros [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| fields macros App Sharing disabled eai:acl.perms.read| rename eai:acl.perms.read as MacroRead, App as AppOfMacro]|eval PermissionIssue=if(match(SearchRead,MacroRead),"No","Yes")| eval PermissionIssue=if(MacroRead="*","No",PermissionIssue)| search PermissionIssue="Yes"| stats dc(macros)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Macros with permission issue used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+
+| rex field=Search_String "\`(?&lt;macros&gt;[^\`]+)`" max_match=100 
+
+| rename App as AppOfSearch 
+| mvexpand macros| fields author,title,AppOfSearch,macros,eai:acl.perms.read| dedup title macros| rename eai:acl.perms.read as SearchRead| join outer macros [| rest /servicesNS/-/-/admin/macros 
+    | rename eai:acl.app as App    | rename title as macros | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,macros,updated|rename eai:acl.sharing as Sharing| fields macros App Sharing disabled eai:acl.perms.read| rename eai:acl.perms.read as MacroRead, App as AppOfMacro]|eval PermissionIssue=if(match(SearchRead,MacroRead),"No","Yes")| eval PermissionIssue=if(MacroRead="*","No",PermissionIssue)| search PermissionIssue="Yes"| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Macros with Permission issue used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+</dashboard>

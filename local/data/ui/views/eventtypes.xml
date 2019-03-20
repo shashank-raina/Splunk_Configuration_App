@@ -1,0 +1,396 @@
+<dashboard>
+  <label>Eventtypes</label>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner 
+| table author title Search_String App updated Owner 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| fillnull value=- eventtype_name tag_name macro_name lookup_name 
+| fields author,title,Search_String,App,eventtype_name| eventstats count as TotalSearches 
+| mvexpand eventtype_name | dedup title eventtype_name
+| eventstats dc(eventtype_name) as NumberOfUniqueEventtypesUsed,count as TotalEventtypesUsed 
+| eval AverageEventtypesUsedPerSearch=round(TotalEventtypesUsed/TotalSearches,0) 
+| fields TotalEventtypesUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. Of times Eventtypes Used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner 
+| table author title Search_String App updated Owner 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| fillnull value=- eventtype_name tag_name macro_name lookup_name 
+| fields author,title,Search_String,App,eventtype_name| eventstats count as TotalSearches 
+| mvexpand eventtype_name | dedup title eventtype_name
+| eventstats dc(eventtype_name) as NumberOfUniqueEventtypesUsed,count as TotalEventtypesUsed 
+| eval AverageEventtypesUsedPerSearch=round(TotalEventtypesUsed/TotalSearches,0) 
+| fields NumberOfUniqueEventtypesUsed</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. Of Unique Eventtypes Used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App    | rename title as eventtypes| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated| stats dc(eventtypes) as NumberOfEventtypesDefined</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">Average Eventtypes Used Per Search</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String, eai:acl.owner as Owner 
+| table author title Search_String App updated Owner 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtype_name&gt;\w+[-\w+]+)" max_match=100 
+| fillnull value=- eventtype_name tag_name macro_name lookup_name 
+| fields author,title,Search_String,App,eventtype_name| eventstats count as TotalSearches 
+| mvexpand eventtype_name | dedup title eventtype_name
+| eventstats dc(eventtype_name) as NumberOfUniqueEventtypesUsed,count as TotalEventtypesUsed 
+| eval AverageEventtypesUsedPerSearch=round(TotalEventtypesUsed/TotalSearches,2) 
+| fields AverageEventtypesUsedPerSearch</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">Number Of Eventtypes Defined</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| fields author,title,Search_String,App,eventtypes 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| fields - Search_String 
+| join type=outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    |rename title as eventtypes| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated|rename eai:acl.sharing as Sharing| dedup eventtypes App Sharing| fields eventtypes App Sharing| stats values(App) as App, values(Sharing) as Sharing by eventtypes| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfEventtypes] 
+| rename eventtypes as EventtypesUsedInSavedSearch 
+|fillnull value="-- Tag Not Found --" AppOfEventtypes| fields - Sharing| eval PermissionIssue=case(AppOfEventtypes="-- Tag Not Found --",AppOfEventtypes,AppOfSearch=AppOfEventtypes,"No",AppOfSearch!=AppOfEventtypes,"Yes")| eval PermissionIssue=if(AppOfEventtypes="Global","No",PermissionIssue)| search PermissionIssue="-- Tag Not Found --"| stats dc(EventtypesUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. Of Eventtypes Used BUT Not Defined</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| fields author,title,Search_String,App,eventtypes 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| fields - Search_String 
+| join type=outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    |rename title as eventtypes| table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated|rename eai:acl.sharing as Sharing| dedup eventtypes App Sharing| fields eventtypes App Sharing| stats values(App) as App, values(Sharing) as Sharing by eventtypes| eval App=if(like(Sharing,"%global%"),"Global",App)| rename App as AppOfEventtypes] 
+| rename eventtypes as EventtypesUsedInSavedSearch 
+|fillnull value="-- Tag Not Found --" AppOfEventtypes| fields - Sharing| eval PermissionIssue=case(AppOfEventtypes="-- Tag Not Found --",AppOfEventtypes,AppOfSearch=AppOfEventtypes,"No",AppOfSearch!=AppOfEventtypes,"Yes")| eval PermissionIssue=if(AppOfEventtypes="Global","No",PermissionIssue)| search PermissionIssue="-- Tag Not Found --"| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Undefined Eventtypes Used</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| fields author,title,Search_String,App,eventtypes 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| fields - Search_String 
+| join type=outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    | rename title as eventtypes 
+    | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup eventtypes App Sharing 
+    | fields eventtypes App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by eventtypes 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOfEventtypes] 
+| rename eventtypes as EventtypesUsedInSavedSearch 
+| fillnull value="-- Tag Not Found --" AppOfEventtypes 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOfEventtypes="-- Tag Not Found --",AppOfEventtypes,AppOfSearch=AppOfEventtypes,"No",AppOfSearch!=AppOfEventtypes,"Yes") 
+| eval PermissionIssue=if(AppOfEventtypes="Global","No",PermissionIssue) 
+| search PermissionIssue="-- Tag Not Found --" 
+| search disabled=1 | stats dc(EventtypesUsedInSavedSearch)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No.of Disabled Eventtypes Used</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| fields author,title,Search_String,App,eventtypes 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| fields - Search_String 
+| join type=outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    | rename title as eventtypes 
+    | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup eventtypes App Sharing 
+    | fields eventtypes App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by eventtypes 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOfEventtypes] 
+| rename eventtypes as EventtypesUsedInSavedSearch 
+| fillnull value="-- Tag Not Found --" AppOfEventtypes 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOfEventtypes="-- Tag Not Found --",AppOfEventtypes,AppOfSearch=AppOfEventtypes,"No",AppOfSearch!=AppOfEventtypes,"Yes") 
+| eval PermissionIssue=if(AppOfEventtypes="Global","No",PermissionIssue) 
+| search PermissionIssue="-- Tag Not Found --" 
+| search disabled=1 | stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Disabled Eventtypes used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| fields author,title,Search_String,App,eventtypes 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| fields - Search_String 
+| join type=outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    | rename title as eventtypes 
+    | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup eventtypes App Sharing 
+    | fields eventtypes App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by eventtypes 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOfEventtypes] 
+| rename eventtypes as EventtypesUsedInSavedSearch 
+| fillnull value="-- Tag Not Found --" AppOfEventtypes 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOfEventtypes="-- Tag Not Found --",AppOfEventtypes,AppOfSearch=AppOfEventtypes,"No",AppOfSearch!=AppOfEventtypes,"Yes") 
+| eval PermissionIssue=if(AppOfEventtypes="Global","No",PermissionIssue) 
+| search PermissionIssue="-- Tag Not Found --" 
+| search PermissionIssue="Yes"  | stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Eventtypes Used with Sharing Issue</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| table author title Search_String App 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| fields author,title,Search_String,App,eventtypes 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| fields - Search_String 
+| join type=outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    | rename title as eventtypes 
+    | table App,author,diabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated 
+    | rename eai:acl.sharing as Sharing 
+    | dedup eventtypes App Sharing 
+    | fields eventtypes App Sharing 
+    | stats values(App) as App, values(Sharing) as Sharing by eventtypes 
+    | eval App=if(like(Sharing,"%global%"),"Global",App) 
+    | rename App as AppOfEventtypes] 
+| rename eventtypes as EventtypesUsedInSavedSearch 
+| fillnull value="-- Tag Not Found --" AppOfEventtypes 
+| fields - Sharing 
+| eval PermissionIssue=case(AppOfEventtypes="-- Tag Not Found --",AppOfEventtypes,AppOfSearch=AppOfEventtypes,"No",AppOfSearch!=AppOfEventtypes,"Yes") 
+| eval PermissionIssue=if(AppOfEventtypes="Global","No",PermissionIssue) 
+| search PermissionIssue="-- Tag Not Found --" 
+| search PermissionIssue="Yes"  | stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Sharing issue Eventtypes Used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| dedup title eventtypes 
+| fields author,title,AppOfSearch,eventtypes,eai:acl.perms.read 
+| rename eai:acl.perms.read as SearchRead| join outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    | rename title as eventtypes 
+    | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated 
+    | rename eai:acl.sharing as Sharing 
+    | fields eventtypes eventtypes Sharing disabled eai:acl.perms.read| rename eai:acl.perms.read as eventtypesRead, App as AppOfeventtypes]| eval PermissionIssue=if(match(SearchRead,eventtypesRead),"No","Yes") 
+| eval PermissionIssue=if(eventtypesRead="*","No",PermissionIssue)| search PermissionIssue="Yes" 
+| stats dc(eventtypes)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of Eventtypes used with Permission issue</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| rest /servicesNS/-/-/saved/searches 
+| rename eai:acl.app as App, qualifiedSearch as Search_String 
+| rex field=Search_String "eventtype\=\"(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rex field=Search_String "eventtype\=(?&lt;eventtypes&gt;\w+[-\w+]+)" max_match=100 
+| rename App as AppOfSearch 
+| mvexpand eventtypes 
+| dedup title eventtypes 
+| fields author,title,AppOfSearch,eventtypes,eai:acl.perms.read 
+| rename eai:acl.perms.read as SearchRead| join outer eventtypes 
+    [| rest /servicesNS/-/-/admin/eventtypes 
+    | rename eai:acl.app as App 
+    | rename title as eventtypes 
+    | table App,author,disabled,eai:acl.owner,eai:acl.perms.read,eai:acl.perms.write,eai:acl.sharing,eventtypes,updated 
+    | rename eai:acl.sharing as Sharing 
+    | fields eventtypes eventtypes Sharing disabled eai:acl.perms.read| rename eai:acl.perms.read as eventtypesRead, App as AppOfeventtypes]| eval PermissionIssue=if(match(SearchRead,eventtypesRead),"No","Yes") 
+| eval PermissionIssue=if(eventtypesRead="*","No",PermissionIssue)| search PermissionIssue="Yes" 
+| stats count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="underLabel">No. of times Eventtypes with permission issue used</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+</dashboard>
