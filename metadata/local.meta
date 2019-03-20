@@ -13,7 +13,6 @@ modtime = 1497009130.445758000
 [views/all_configurations]
 access = read : [ * ], write : [ * ]
 export = system
-owner = admin
 version = 6.6.1
 modtime = 1498569674.465247000
 
