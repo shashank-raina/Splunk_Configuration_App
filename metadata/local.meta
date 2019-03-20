@@ -1,0 +1,222 @@
+[app/ui]
+version = 6.6.1
+modtime = 1497009130.436863000
+
+[app/launcher]
+version = 6.6.1
+modtime = 1497009130.442950000
+
+[app/package/check_for_updates]
+version = 6.6.1
+modtime = 1497009130.445758000
+
+[views/all_configurations]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498569674.465247000
+
+[views/viewsdashboards]
+owner = admin
+version = 6.6.1
+modtime = 1498653340.184526000
+
+[savedsearches/Enabled%20Views]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498652453.008896000
+
+[savedsearches/Disabled%20Views]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498651366.924963000
+
+[savedsearches/All%20Views%20with%20Last%20Modified%20Date%20and%20Time]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498651503.127684000
+
+[savedsearches/Private%20Views]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498651376.137445000
+
+[views/saved_searches]
+owner = admin
+version = 6.6.2
+modtime = 1502816332.544535000
+
+[views/all_configurations_detail]
+owner = admin
+version = 6.6.1
+modtime = 1498570396.772799000
+
+[views/saved_searches_with_configs_used]
+owner = admin
+version = 6.6.1
+modtime = 1498571772.607540000
+
+[savedsearches/Curated%20output%20for%20Views]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498651352.535209000
+
+[savedsearches/Raw%20Output%20for%20Views]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498651382.541907000
+
+[savedsearches/Dashboards%20having%20similar%20searches]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498659462.386723000
+
+[savedsearches/All%20KOs%20used%20in%20Saved%20Searches]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498739147.058101000
+
+[savedsearches/Tags%20not%20found%20and%20permission%20issue]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498747986.966356000
+
+[savedsearches/Searches%20with%20Tags%20not%20defined]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498751095.708549000
+
+[savedsearches/Searches%20with%20Tags%20having%20permission%20issue]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1498751200.361923000
+
+[views/tags]
+owner = admin
+version = 6.6.2
+modtime = 1502809400.821325000
+
+[views/macros]
+owner = admin
+version = 6.6.2
+modtime = 1502809336.524732000
+
+[views/eventtypes]
+owner = admin
+version = 6.6.2
+modtime = 1502809426.690818000
+
+[views/lookups]
+owner = admin
+version = 6.6.2
+modtime = 1502809307.442832000
+
+[savedsearches/Saved%20Search%20Strings]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.2
+modtime = 1502818673.379111000
+
+[views/saved_searches_optimization]
+owner = admin
+version = 6.6.2
+modtime = 1502893035.110226000
+
+[views/system_check]
+owner = admin
+version = 6.6.2
+modtime = 1502886331.049899000
+
+[views/deployment_information]
+owner = admin
+version = 6.6.2
+modtime = 1502891469.721953000
+
+[views/executed_searches_summary]
+owner = admin
+version = 6.6.2
+modtime = 1502963292.678735000
+
+[views/scheduled_searches]
+owner = admin
+version = 6.6.2
+modtime = 1503056895.974889000
+
+[transforms/CommandNames]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.2
+modtime = 1502971987.252530000
+
+[views/saved_searches_pattern]
+owner = admin
+version = 6.6.2
+modtime = 1504707966.066734000
+
+[views/dispatch_directory_summary]
+owner = admin
+version = 6.6.2
+modtime = 1503056288.093114000
+
+[views/health_check]
+owner = admin
+version = 6.6.2
+modtime = 1503070108.706564000
+
+[views/search_usage_patterns]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.2
+modtime = 1503654735.590197000
+
+[views/data_inputs]
+owner = admin
+version = 6.6.2
+modtime = 1504016387.790747000
+
+[macros/input_components]
+access = read : [ * ], write : [ * ]
+export = system
+owner = admin
+version = 6.6.2
+modtime = 1504016158.827761000
+
+[lookups/CommandNames.csv]
+access = read : [ * ], write : [ * ]
+export = none
+owner = admin
+version = 6.6.2
+modtime = 1504707492.349321000
+
+[lookups/cron2basic.csv]
+access = read : [ * ], write : [ * ]
+export = system
+owner = nobody
+version = 6.6.2
+modtime = 1504708727.978643000
