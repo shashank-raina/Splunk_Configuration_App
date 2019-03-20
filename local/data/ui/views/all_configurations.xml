@@ -1,5 +1,5 @@
 <form>
-  <label>All Configurations Overview</label>
+  <label>All Configurations Overview </label>
   <fieldset submitButton="false" autoRun="true">
     <input type="dropdown" token="apps" searchWhenChanged="true">
       <label>Apps</label>
