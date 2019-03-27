@@ -29,7 +29,7 @@ version = 6.6.1
 modtime = 1498652453.008896000
 
 [savedsearches/Disabled%20Views]
-access = read : [ * ], write : [ * ]
+access = read : [ * ], write : [ admin ]
 export = system
 owner = admin
 version = 6.6.1
