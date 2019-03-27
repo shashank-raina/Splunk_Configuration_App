@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011 Splunk Inc.  All Rights Reserved.  Version 4.0
+# Copyright (C) 2005-2019 Splunk Inc.  All Rights Reserved.  Version 4.0
 
 import splunk.Intersplunk as si
 import splunk.searchhelp.utils as parseutils
