@@ -36,7 +36,7 @@ version = 6.6.1
 modtime = 1498651366.924963000
 
 [savedsearches/All%20Views%20with%20Last%20Modified%20Date%20and%20Time]
-access = read : [ * ], write : [ * ]
+access = read : [ * ], write : [ admin ]
 export = system
 owner = admin
 version = 6.6.1
