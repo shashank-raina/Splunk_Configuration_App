@@ -43,7 +43,7 @@ version = 6.6.1
 modtime = 1498651503.127684000
 
 [savedsearches/Private%20Views]
-access = read : [ * ], write : [ * ]
+access = read : [ * ], write : [ admin ]
 export = system
 owner = admin
 version = 6.6.1
